@@ -39,7 +39,8 @@ dnf5 install -y --skip-broken \
   libwacom-devel libxcvt-devel libxkbcommon-devel libxkbcommon-x11-devel libxkbfile-devel \
   libxml2 libzip-devel libzstd-devel lm_sensors-devel make meson mpv-libs-devel openal-soft-devel \
   openexr-devel openjpeg2-devel pam-devel pcre-devel phonon-qt5-devel pipewire-devel \
-  pipewire-utils 'pkgconfig(ModemManager)' 'pkgconfig(accounts-qt6)' 'pkgconfig(dbus-1)' \
+  pipewire-utils \
+  'pkgconfig(ModemManager)' 'pkgconfig(accounts-qt6)' 'pkgconfig(dbus-1)' \
   'pkgconfig(gbm)' 'pkgconfig(gl)' 'pkgconfig(gstreamer-1.0)' 'pkgconfig(libaccounts-glib)' \
   'pkgconfig(libassuan)' 'pkgconfig(libattr)' 'pkgconfig(libavcodec)' 'pkgconfig(libavfilter)' \
   'pkgconfig(libavformat)' 'pkgconfig(libavutil)' 'pkgconfig(libnm)' 'pkgconfig(libpng)' \
@@ -49,16 +50,16 @@ dnf5 install -y --skip-broken \
   'pkgconfig(wayland-protocols)' 'pkgconfig(xapian-core)' 'pkgconfig(xcb-cursor)' \
   'pkgconfig(xcb-ewmh)' 'pkgconfig(xcb-keysyms)' 'pkgconfig(xcb-util)' 'pkgconfig(xfixes)' \
   'pkgconfig(xrender)' plymouth-devel plasma-discover pyside6-tools python python3-psutil \
-  python3-setuptools python3-sphinx python3dist(sphinxcontrib-qthelp) \
-  qaccessibilityclient-*devel qcoro-qt5-devel qgpgme-devel qt5-*-devel qt5-qtbase-static \
-  qt5-qttools-static qt6-*-devel qtkeychain-qt5-devel sassc shared-mime-info shiboken6 \
-  signon-devel shadow-utils shadow-utils-subid-devel stellarsolver-devel systemd-devel \
-  texinfo wcslib-devel xdotool xkeyboard-config-devel xmlto \
+  python3-setuptools python3-sphinx \
+  'python3dist(sphinxcontrib-qthelp)' 'qaccessibilityclient-*devel' qcoro-qt5-devel qgpgme-devel \
+  'qt5-*-devel' qt5-qtbase-static qt5-qttools-static 'qt6-*-devel' qtkeychain-qt5-devel sassc \
+  shared-mime-info shiboken6 signon-devel shadow-utils shadow-utils-subid-devel \
+  stellarsolver-devel systemd-devel texinfo wcslib-devel xdotool xkeyboard-config-devel xmlto \
   xorg-x11-drv-evdev-devel xorg-x11-drv-libinput-devel xorg-x11-drv-wacom-devel expat-devel \
-  libcurl-devel nss-devel gi-docgen guidelines-support-library-devel libstemmer-devel \
-  libyaml-devel 'pkgconfig(librsvg-2.0)' 'pkgconfig(libgphoto2)' opencv-devel zxing-cpp-devel \
-  ostree-devel cdparanoia-devel 'pkgconfig(xt)' freerdp freerdp-devel 'cmake(ryml)' \
-  libmpc-devel python3dist(build) clang
+  libcurl-devel nss-devel gi-docgen guidelines-support-library-devel libstemmer-devel libyaml-devel \
+  'pkgconfig(librsvg-2.0)' 'pkgconfig(libgphoto2)' opencv-devel zxing-cpp-devel ostree-devel \
+  cdparanoia-devel 'pkgconfig(xt)' freerdp freerdp-devel 'cmake(ryml)' libmpc-devel \
+  'python3dist(build)' clang
 
 ### 🎮 Steam & Development Tools
 log "Installing Steam and additional dev tools..."
