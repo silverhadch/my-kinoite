@@ -63,7 +63,7 @@ dnf5 install -y --skip-broken \
 
 ### 🎮 Steam & Development Tools
 log "Installing Steam and additional dev tools..."
-dnf5 install -y steam steam-devices neovim zsh distrobox
+dnf5 install -y steam steam-devices neovim zsh distrobox waydroid
 
 ### 🦫 Go & Toolbx Development
 log "Installing Go toolchain and Toolbx-related tools..."
