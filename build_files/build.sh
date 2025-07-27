@@ -77,6 +77,8 @@ dnf5 remove -y firefox
 log "Enabling podman socket..."
 systemctl enable podman.socket
 
+log "Enabling waydroid service..."
+systemctl enable waydroid-container.service
 # ─────────────────────────────────────────────────────────
 # 🧪 You can enable COPRs temporarily like this:
 # dnf5 -y copr enable ublue-os/staging
