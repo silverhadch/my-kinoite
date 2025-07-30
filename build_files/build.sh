@@ -20,7 +20,7 @@ cd ~
 export PATH="$HOME/.local/bin:$PATH"
 curl 'https://invent.kde.org/sdk/kde-builder/-/raw/master/scripts/initial_setup.sh' > initial_setup.sh
 bash initial_setup.sh
-kde-builder --generate-config
+kde-builder --generate-config --prompt-answer Y
 kde-builder --install-distro-packages --prompt-answer Y
 cd /
 rm -rf /root 
