@@ -12,7 +12,7 @@ dnf5 install -y \
   https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
 log "Installing multimedia codecs..."
-dnf5 install -y libavcodec-freeworld --allowerasing
+dnf5 install -y --skip-broken libavcodec-freeworld --allowerasing
 dnf5 swap -y ffmpeg-free ffmpeg --allowerasing
 
 ### 🔧 KDE Build Dependencies
