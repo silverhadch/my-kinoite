@@ -18,17 +18,19 @@ dnf5 copr enable -y solopasha/kde-gear-unstable
 
 dnf5 install -y yq
 
-### 🔁 Reinstall packages from kinoite-packages.yaml (repo-packages only)
-log "Reinstalling Plasma & Gear packages from COPRs..."
+### 🔁 Install packages from kinoite-packages.yaml (repo-packages only)
+log "Installing Plasma & Gear packages from COPRs..."
 curl -sSL https://raw.githubusercontent.com/solopasha/kde6-copr/unstable/atomic/kinoite-packages.yaml |
   yq eval '."repo-packages"[] | .repo + " " + (.packages | join(" "))' |
   while read -r repo pkgs; do
-    echo "🔁 Reinstalling from $repo with priority 1:"
+    echo "🔁 Installing/updating from $repo with priority 1:"
     echo "    $pkgs"
-    dnf5 reinstall -y \
+    dnf5 install -y \
       --disablerepo='*' \
       --enablerepo="$repo" \
       --setopt="$repo.priority=1" \
+      --best \
+      --allowerasing \
       $pkgs
   done
 
