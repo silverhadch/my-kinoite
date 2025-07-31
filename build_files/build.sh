@@ -16,12 +16,12 @@ log "Enabling KDE COPRs..."
 dnf5 copr enable -y solopasha/plasma-unstable
 dnf5 copr enable -y solopasha/kde-gear-unstable
 
-dnf5 install yq -y
+dnf5 install -y yq
 
 ### 🔁 Reinstall packages from kinoite-packages.yaml (repo-packages only)
 log "Reinstalling Plasma & Gear packages from COPRs..."
 curl -sSL https://raw.githubusercontent.com/solopasha/kde6-copr/unstable/atomic/kinoite-packages.yaml |
-  yq -r '.["repo-packages"][] | "\(.repo) \(.packages | join(" "))"' |
+  yq eval '."repo-packages"[] | .repo + " " + (.packages | join(" "))' |
   while read -r repo pkgs; do
     echo "🔁 Reinstalling from $repo with priority 1:"
     echo "    $pkgs"
