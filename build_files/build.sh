@@ -13,7 +13,7 @@ dnf5 install -y \
 
 ### 🧪 KDE Unstable COPR
 log "Enabling KDE Plasma 6 Unstable COPR..."
-dnf5 -y copr enable kdesig/plasma-6-unstable
+dnf5 -y copr enable @kdesig/plasma-6-unstable
 
 log "Refreshing metadata and force-upgrading KDE packages..."
 dnf5 upgrade --refresh -y
