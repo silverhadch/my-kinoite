@@ -3,7 +3,7 @@ FROM scratch AS ctx
 COPY build_files /
 
 # Base Image
-FROM ghcr.io/ublue-os/kinoite-main:latest
+FROM ghcr.io/solopasha/kde6-copr/kde-unstable:42
 
 
 ## Other possible base images include:
