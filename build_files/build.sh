@@ -11,13 +11,6 @@ dnf5 install -y \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
   https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
-### 🧪 KDE Unstable COPR
-log "Enabling KDE Plasma 6 Unstable COPR..."
-dnf5 -y copr enable @kdesig/plasma-6-unstable
-
-log "Refreshing metadata and force-upgrading KDE packages..."
-dnf5 upgrade --refresh -y
-
 ### 🔧 KDE Build Dependencies
 log "Installing KDE build dependencies (this might take a while)..."
 dnf5 install -y git python3-dbus python3-pyyaml python3-setproctitle
