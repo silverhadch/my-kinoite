@@ -3,8 +3,7 @@ FROM scratch AS ctx
 COPY build_files /
 
 # Base Image
-FROM ghcr.io/solopasha/kde6-copr/kde-unstable:42
-
+FROM ghcr.io/solopasha/kde6-copr/kde-unstable:rawhide
 
 ## Other possible base images include:
 # FROM ghcr.io/ublue-os/bazzite:latest
