@@ -14,7 +14,7 @@ dnf5 install -y --allowerasing \
 
 ### 🔧 KDE Build Dependencies
 log "Installing KDE build dependencies (using solopasha COPRs where possible)..."
-dnf5 install -y --skip-broken --allowerasing git python3-dbus python3-pyyaml python3-setproctitle clang-devel
+dnf5 install -y --skip-broken --allowerasing git python3-dbus python3-pyyaml python3-setproctitle
 
 curl -s 'https://invent.kde.org/sysadmin/repo-metadata/-/raw/master/distro-dependencies/fedora.ini' |
   sed '1d' | grep -vE '^\s*#|^\s*$' |
