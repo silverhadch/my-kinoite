@@ -7,26 +7,26 @@ log() {
 
 ### 🧰 Initial Setup
 log "Setting up RPM Fusion repositories..."
-dnf5 install -y \
+dnf5 install -y --allowerasing \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
   https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
 
 ### 🔧 KDE Build Dependencies
 log "Installing KDE build dependencies (using solopasha COPRs where possible)..."
-dnf5 install -y --skip-broken git python3-dbus python3-pyyaml python3-setproctitle clang-devel
+dnf5 install -y --skip-broken --allowerasing git python3-dbus python3-pyyaml python3-setproctitle clang-devel
 
 curl -s 'https://invent.kde.org/sysadmin/repo-metadata/-/raw/master/distro-dependencies/fedora.ini' |
   sed '1d' | grep -vE '^\s*#|^\s*$' |
-  xargs dnf5 install -y --skip-broken
+  xargs dnf5 install -y --skip-broken --allowerasing
 
 ### 🎮 Steam & Development Tools
 log "Installing Steam and additional dev tools..."
-dnf5 install -y steam steam-devices neovim zsh distrobox waydroid flatpak-builder
+dnf5 install -y --allowerasing steam steam-devices neovim zsh distrobox waydroid flatpak-builder
 
 ### 🦫 Go & Toolbx Development
 log "Installing Go toolchain and Toolbx-related tools..."
-dnf5 install -y golang gopls golang-github-cpuguy83-md2man
+dnf5 install -y --allowerasing golang gopls golang-github-cpuguy83-md2man
 
 ### 🧹 Cleanup
 log "Removing unnecessary packages..."
