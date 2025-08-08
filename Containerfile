@@ -3,7 +3,7 @@ FROM scratch AS ctx
 COPY build_files /
 
 # Base Image
-FROM ghcr.io/solopasha/kde6-copr/kde-unstable:rawhide
+FROM quay.io/fedora-ostree-desktops/kinoite-nightly:rawhide
 
 ## Other possible base images include:
 # FROM ghcr.io/ublue-os/bazzite:latest
