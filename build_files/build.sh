@@ -9,16 +9,16 @@ COPR_PLASMA="copr:copr.fedorainfracloud.org/solopasha/plasma-unstable"
 COPR_GEAR="copr:copr.fedorainfracloud.org/solopasha/kde-gear-unstable"
 
 echo "==> Updating repo metadata..."
-sudo dnf5 clean all
-sudo dnf5 makecache
+dnf5 clean all
+dnf5 makecache
 
 echo "==> Setting COPR priorities..."
-sudo dnf5 copr enable "$COPR_PLASMA" -y
-sudo dnf5 copr enable "$COPR_GEAR" -y
+dnf5 copr enable "$COPR_PLASMA" -y
+dnf5 copr enable "$COPR_GEAR" -y
 
 # Plasma COPR has highest priority
-sudo dnf5 config-manager setopt "$COPR_PLASMA".priority=1
-sudo dnf5 config-manager setopt "$COPR_GEAR".priority=2
+dnf5 config-manager setopt "$COPR_PLASMA".priority=1
+dnf5 config-manager setopt "$COPR_GEAR".priority=2
 
 echo "==> Listing packages from COPRs..."
 PLASMA_PKGS=$(dnf5 repoquery --repo="$COPR_PLASMA" --qf "%{name}" || true)
@@ -44,10 +44,10 @@ echo "Gear COPR packages installed: ${INSTALLED_GEAR_PKGS[*]:-none}"
 
 echo "==> Reinstalling from highest priority COPRs..."
 if [ ${#INSTALLED_PLASMA_PKGS[@]} -gt 0 ]; then
-    sudo dnf5 reinstall -y "${INSTALLED_PLASMA_PKGS[@]}"
+    dnf5 reinstall -y "${INSTALLED_PLASMA_PKGS[@]}"
 fi
 if [ ${#INSTALLED_GEAR_PKGS[@]} -gt 0 ]; then
-    sudo dnf5 reinstall -y "${INSTALLED_GEAR_PKGS[@]}"
+    dnf5 reinstall -y "${INSTALLED_GEAR_PKGS[@]}"
 fi
 
 echo "==> Done."
