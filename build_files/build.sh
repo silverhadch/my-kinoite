@@ -6,21 +6,22 @@ log() {
 }
 
 COPRS=(
-    "copr:copr.fedorainfracloud.org/solopasha/plasma-unstable"
-    "copr:copr.fedorainfracloud.org/solopasha/kde-gear-unstable"
+    "solopasha/plasma-unstable"
+    "solopasha/kde-gear-unstable"
 )
 
-### 🏗 Set COPR priorities and reinstall matching packages
-log "Setting COPR priorities and replacing installed packages..."
-
-dnf5 install -y dnf5-plugins
-
+### Enable COPRs and set priority
 for copr in "${COPRS[@]}"; do
+    log "Enabling COPR: $copr"
+    dnf5 -y copr enable "$copr"
     log "Setting priority=1 for $copr"
-    dnf5 config-manager --setopt="$copr".priority=1
+    dnf5 -y config-manager setopt "copr:copr.fedorainfracloud.org:${copr////:}.priority=1"
+done
 
-    log "Listing available packages from $copr"
-    pkg_list=$(dnf5 repoquery --qf '%{name}' --disablerepo='*' --enablerepo="$copr" || true)
+### Replace installed packages with COPR versions
+for copr in "${COPRS[@]}"; do
+    log "Checking packages from $copr..."
+    pkg_list=$(dnf5 repoquery --qf '%{name}' --disablerepo='*' --enablerepo="copr:copr.fedorainfracloud.org:${copr////:}" || true)
 
     if [[ -z "$pkg_list" ]]; then
         echo "  ⚠ No packages found in $copr (skipping)"
@@ -30,7 +31,7 @@ for copr in "${COPRS[@]}"; do
     for pkg in $pkg_list; do
         if rpm -q "$pkg" >/dev/null 2>&1; then
             echo "  🔄 Reinstalling $pkg from $copr..."
-            dnf5 reinstall -y "$pkg" --disablerepo='*' --enablerepo="$copr"
+            dnf5 reinstall -y "$pkg" --disablerepo='*' --enablerepo="copr:copr.fedorainfracloud.org:${copr////:}"
         else
             echo "  ⏩ Skipping $pkg (not installed)"
         fi
