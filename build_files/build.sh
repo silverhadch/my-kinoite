@@ -15,7 +15,7 @@ for copr in "${COPRS[@]}"; do
     log "Enabling COPR: $copr"
     dnf5 -y copr enable "$copr"
     log "Setting priority=1 for $copr"
-    dnf5 -y config-manager setopt "copr:copr.fedorainfracloud.org:${copr////:}.priority=1" --save
+    dnf5 -y config-manager setopt "copr:copr.fedorainfracloud.org:${copr////:}.priority=1"
 done
 
 ### Replace installed packages with COPR versions
