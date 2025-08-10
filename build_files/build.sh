@@ -6,12 +6,14 @@ log() {
 }
 
 COPRS=(
-    "copr:copr.fedorainfracloud.org/solopasha/kde-gear-unstable"
     "copr:copr.fedorainfracloud.org/solopasha/plasma-unstable"
+    "copr:copr.fedorainfracloud.org/solopasha/kde-gear-unstable"
 )
 
 ### 🏗 Set COPR priorities and reinstall matching packages
 log "Setting COPR priorities and replacing installed packages..."
+
+dnf5 install -y dnf5-plugins
 
 for copr in "${COPRS[@]}"; do
     log "Setting priority=1 for $copr"
