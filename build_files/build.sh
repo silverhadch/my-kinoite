@@ -23,7 +23,7 @@ for copr in "${COPRS[@]}"; do
     log "Checking packages from $copr..."
     repo_name="copr:copr.fedorainfracloud.org:${copr////:}"
     
-    # Get package list and properly split into lines
+    # Get package list - using the new dnf5 repoquery format
     pkg_list=$(dnf5 --quiet repoquery --available --repo="$repo_name" --qf '%{name}' | sort -u)
     
     if [[ -z "$pkg_list" ]]; then
@@ -42,7 +42,7 @@ for copr in "${COPRS[@]}"; do
         
         if rpm -q "$pkg" &>/dev/null; then
             echo "  🔄 [$current/$total_pkgs] Reinstalling $pkg from $copr..."
-            if ! dnf5 reinstall -y "$pkg" --disablerepo='*' --enablerepo="$repo_name"; then
+            if ! dnf5 reinstall -y --skip-unavailable "$pkg" --disablerepo='*' --enablerepo="$repo_name"; then
                 echo "  ❌ Failed to reinstall $pkg"
             fi
         else
@@ -53,7 +53,7 @@ done
 
 ### 🔧 KDE Build Dependencies
 log "Installing KDE build dependencies..."
-dnf5 install -y --skip-broken --allowerasing git python3-dbus python3-pyyaml python3-setproctitle clang-devel
+dnf5 install -y --skip-broken --allowerasing --skip-unavailable git python3-dbus python3-pyyaml python3-setproctitle clang-devel
 
 log "Installing KDE Builder dependencies from repo-metadata..."
 fedora_ini_url='https://invent.kde.org/sysadmin/repo-metadata/-/raw/master/distro-dependencies/fedora.ini'
@@ -62,7 +62,7 @@ if curl -s --fail "$fedora_ini_url" > /tmp/fedora.ini; then
     while IFS= read -r pkg; do
         [[ -z "$pkg" || "$pkg" =~ ^# ]] && continue
         echo "  📦 Installing $pkg..."
-        dnf5 install -y --skip-broken --allowerasing "$pkg"
+        dnf5 install -y --skip-broken --allowerasing --skip-unavailable "$pkg"
     done < <(sed '1d' /tmp/fedora.ini)
     rm -f /tmp/fedora.ini
 else
@@ -71,11 +71,11 @@ fi
 
 ### 🎮 Development Tools
 log "Installing additional dev tools..."
-dnf5 install -y --allowerasing neovim zsh flatpak-builder
+dnf5 install -y --allowerasing --skip-unavailable neovim zsh flatpak-builder
 
 ### 🦫 Go & Toolbx Development
 log "Installing Go toolchain..."
-dnf5 install -y --allowerasing golang gopls golang-github-cpuguy83-md2man
+dnf5 install -y --allowerasing --skip-unavailable golang gopls golang-github-cpuguy83-md2man
 
 ### 🔌 Enable systemd units
 log "Enabling podman socket..."
