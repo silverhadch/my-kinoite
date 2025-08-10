@@ -38,7 +38,7 @@ for copr in "${COPRS[@]}"; do
     while IFS= read -r pkg; do
         if rpm -q "$pkg" >/dev/null 2>&1; then
             echo "  🔄 Swapping $pkg (using $copr_repo)"
-            if ! dnf5 swap -y --skip-unavailable --allowerasing \
+            if ! dnf5 swap -y --allowerasing \
                --repo="$copr_repo" "$pkg" "$pkg" 2>/tmp/dnf-error; then
                 
                 error "Swap failed: $(grep -v '^Last metadata' /tmp/dnf-error | head -n5)"
