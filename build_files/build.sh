@@ -5,52 +5,40 @@ log() {
     echo -e "\n\033[1;34m==> $1\033[0m\n"
 }
 
-COPR_PLASMA="copr:copr.fedorainfracloud.org/solopasha/plasma-unstable"
-COPR_GEAR="copr:copr.fedorainfracloud.org/solopasha/kde-gear-unstable"
+COPRS=(
+    "solopasha/plasma-unstable"
+    "solopasha/kde-gear-unstable"
+)
 
-echo "==> Updating repo metadata..."
-dnf5 clean all
-dnf5 makecache
-
-echo "==> Setting COPR priorities..."
-dnf5 copr enable "$COPR_PLASMA" -y
-dnf5 copr enable "$COPR_GEAR" -y
-
-# Plasma COPR has highest priority
-dnf5 config-manager setopt "$COPR_PLASMA".priority=1
-dnf5 config-manager setopt "$COPR_GEAR".priority=2
-
-echo "==> Listing packages from COPRs..."
-PLASMA_PKGS=$(dnf5 repoquery --repo="$COPR_PLASMA" --qf "%{name}" || true)
-GEAR_PKGS=$(dnf5 repoquery --repo="$COPR_GEAR" --qf "%{name}" || true)
-
-echo "==> Finding installed packages that are in COPRs..."
-INSTALLED_PLASMA_PKGS=()
-for pkg in $PLASMA_PKGS; do
-    if rpm -q "$pkg" >/dev/null 2>&1; then
-        INSTALLED_PLASMA_PKGS+=("$pkg")
-    fi
+### Enable COPRs and set priority
+for copr in "${COPRS[@]}"; do
+    log "Enabling COPR: $copr"
+    dnf5 -y copr enable "$copr"
+    log "Setting priority=1 for $copr"
+    dnf5 -y config-manager setopt "copr:copr.fedorainfracloud.org:${copr////:}.priority=1"
 done
 
-INSTALLED_GEAR_PKGS=()
-for pkg in $GEAR_PKGS; do
-    if rpm -q "$pkg" >/dev/null 2>&1; then
-        INSTALLED_GEAR_PKGS+=("$pkg")
+### Replace installed packages with COPR versions
+for copr in "${COPRS[@]}"; do
+    log "Checking packages from $copr..."
+    pkg_list=$(dnf5 repoquery --qf '%{name}' --disablerepo='*' \
+        --enablerepo="copr:copr.fedorainfracloud.org:${copr////:}" | sort -u)
+
+    if [[ -z "$pkg_list" ]]; then
+        echo "  ⚠ No packages found in $copr (skipping)"
+        continue
     fi
+
+    while IFS= read -r pkg; do
+        if rpm -q "$pkg" >/dev/null 2>&1; then
+            echo "  🔄 Reinstalling $pkg from $copr..."
+            dnf5 reinstall -y "$pkg" --disablerepo='*' \
+                --enablerepo="copr:copr.fedorainfracloud.org:${copr////:}"
+        else
+            echo "  ⏩ Skipping $pkg (not installed)"
+        fi
+    done <<< "$pkg_list"
 done
-
-echo "Plasma COPR packages installed: ${INSTALLED_PLASMA_PKGS[*]:-none}"
-echo "Gear COPR packages installed: ${INSTALLED_GEAR_PKGS[*]:-none}"
-
-echo "==> Reinstalling from highest priority COPRs..."
-if [ ${#INSTALLED_PLASMA_PKGS[@]} -gt 0 ]; then
-    dnf5 reinstall -y "${INSTALLED_PLASMA_PKGS[@]}"
-fi
-if [ ${#INSTALLED_GEAR_PKGS[@]} -gt 0 ]; then
-    dnf5 reinstall -y "${INSTALLED_GEAR_PKGS[@]}"
-fi
-
-echo "==> Done."
 
 ### 🔧 KDE Build Dependencies
 log "Installing KDE build dependencies (using solopasha COPRs where possible)..."
