@@ -75,7 +75,7 @@ fi
 
 ### 🎮 Development Tools
 log "Installing additional dev tools..."
-dev_tools=(neovim zsh distrobox flatpak-builder)
+dev_tools=(neovim zsh flatpak-builder)
 for tool in "${dev_tools[@]}"; do
     if ! dnf5 install -y --skip-broken --skip-unavailable --allowerasing "$tool" 2>/tmp/dnf-error; then
         error "Failed to install $tool: $(grep -v '^Last metadata' /tmp/dnf-error | head -n5)"
@@ -97,6 +97,3 @@ systemctl enable podman.socket || error "Failed to enable podman.socket"
 
 log "Enabling waydroid service..."
 systemctl enable waydroid-container.service || error "Failed to enable waydroid-container.service"
-
-# Clean up
-rm -f /tmp/dnf-error
