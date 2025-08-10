@@ -24,7 +24,7 @@ for copr in "${COPRS[@]}"; do
     repo_name="copr:copr.fedorainfracloud.org:${copr////:}"
     
     # Get package list and properly split into lines
-    pkg_list=$(dnf5 --quiet repoquery --available --repo="$repo_name" --qf '%{name}\n' | sort -u)
+    pkg_list=$(dnf5 --quiet repoquery --available --repo="$repo_name" --qf '%{name}' | sort -u)
     
     if [[ -z "$pkg_list" ]]; then
         echo "  ⚠ No packages found in $copr (skipping)"
@@ -40,9 +40,11 @@ for copr in "${COPRS[@]}"; do
         # Skip empty lines
         [[ -z "$pkg" ]] && continue
         
-        if rpm -q "$pkg" >/dev/null 2>&1; then
+        if rpm -q "$pkg" &>/dev/null; then
             echo "  🔄 [$current/$total_pkgs] Reinstalling $pkg from $copr..."
-            dnf5 reinstall -y "$pkg" --disablerepo='*' --enablerepo="$repo_name"
+            if ! dnf5 reinstall -y "$pkg" --disablerepo='*' --enablerepo="$repo_name"; then
+                echo "  ❌ Failed to reinstall $pkg"
+            fi
         else
             echo "  ⏩ [$current/$total_pkgs] Skipping $pkg (not installed)"
         fi
