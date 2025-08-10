@@ -5,6 +5,36 @@ log() {
     echo -e "\n\033[1;34m==> $1\033[0m\n"
 }
 
+COPRS=(
+    "copr:copr.fedorainfracloud.org/solopasha/kde-gear-unstable"
+    "copr:copr.fedorainfracloud.org/solopasha/plasma-unstable"
+)
+
+### 🏗 Set COPR priorities and reinstall matching packages
+log "Setting COPR priorities and replacing installed packages..."
+
+for copr in "${COPRS[@]}"; do
+    log "Setting priority=1 for $copr"
+    dnf5 config-manager --setopt="$copr".priority=1
+
+    log "Listing available packages from $copr"
+    pkg_list=$(dnf5 repoquery --qf '%{name}' --disablerepo='*' --enablerepo="$copr" || true)
+
+    if [[ -z "$pkg_list" ]]; then
+        echo "  ⚠ No packages found in $copr (skipping)"
+        continue
+    fi
+
+    for pkg in $pkg_list; do
+        if rpm -q "$pkg" >/dev/null 2>&1; then
+            echo "  🔄 Reinstalling $pkg from $copr..."
+            dnf5 reinstall -y "$pkg" --disablerepo='*' --enablerepo="$copr"
+        else
+            echo "  ⏩ Skipping $pkg (not installed)"
+        fi
+    done
+done
+
 ### 🔧 KDE Build Dependencies
 log "Installing KDE build dependencies (using solopasha COPRs where possible)..."
 dnf5 install -y --skip-broken --allowerasing git python3-dbus python3-pyyaml python3-setproctitle clang-devel
