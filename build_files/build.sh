@@ -18,7 +18,7 @@ for copr in "${COPRS[@]}"; do
     dnf5 -y config-manager setopt "copr:copr.fedorainfracloud.org:${copr////:}.priority=1"
 done
 
-### Replace installed packages with COPR versions
+### Swap installed packages with COPR versions
 for copr in "${COPRS[@]}"; do
     log "Checking packages from $copr..."
     pkg_list=$(dnf5 repoquery --qf '%{name}\n' --disablerepo='*' \
@@ -31,8 +31,8 @@ for copr in "${COPRS[@]}"; do
 
     while IFS= read -r pkg; do
         if rpm -q "$pkg" >/dev/null 2>&1; then
-            echo "  🔄 Reinstalling $pkg from $copr..."
-            dnf5 reinstall -y "$pkg" --disablerepo='*' \
+            echo "  🔄 Swapping $pkg to COPR version..."
+            dnf5 swap -y "$pkg" "$pkg" --disablerepo='*' \
                 --enablerepo="copr:copr.fedorainfracloud.org:${copr////:}"
         else
             echo "  ⏩ Skipping $pkg (not installed)"
@@ -40,7 +40,7 @@ for copr in "${COPRS[@]}"; do
     done <<< "$pkg_list"
 done
 
-### 🔧 KDE Build Dependencies
+### 🔧 KDE Build Dependencies (unchanged)
 log "Installing KDE build dependencies (using solopasha COPRs where possible)..."
 dnf5 install -y --skip-broken --allowerasing git python3-dbus python3-pyyaml python3-setproctitle clang-devel
 
@@ -48,15 +48,15 @@ curl -s 'https://invent.kde.org/sysadmin/repo-metadata/-/raw/master/distro-depen
   sed '1d' | grep -vE '^\s*#|^\s*$' |
   xargs dnf5 install -y --skip-broken --allowerasing
 
-### 🎮 Steam & Development Tools
+### 🎮 Steam & Development Tools (unchanged)
 log "Installing additional dev tools..."
 dnf5 install -y --allowerasing neovim zsh distrobox flatpak-builder
 
-### 🦫 Go & Toolbx Development
+### 🦫 Go & Toolbx Development (unchanged)
 log "Installing Go toolchain and Toolbx-related tools..."
 dnf5 install -y --allowerasing golang gopls golang-github-cpuguy83-md2man
 
-### 🔌 Enable systemd units
+### 🔌 Enable systemd units (unchanged)
 log "Enabling podman socket..."
 systemctl enable podman.socket
 
