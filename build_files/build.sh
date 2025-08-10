@@ -22,38 +22,36 @@ for copr in "${COPRS[@]}"; do
     dnf5 -y config-manager setopt "copr:copr.fedorainfracloud.org:${copr////:}.priority=1" || error "Failed to set priority for $copr"
 done
 
-### Swap installed packages with COPR versions
+### Perform package swaps
 for copr in "${COPRS[@]}"; do
-    log "Checking packages from $copr..."
-    pkg_list=$(dnf5 repoquery --qf '%{name}\n' --enablerepo="copr:copr.fedorainfracloud.org:${copr////:}" | sort -u)
-
+    log "Processing COPR: $copr"
+    copr_repo="copr:copr.fedorainfracloud.org:${copr////:}"
+    
+    # Get package list from COPR
+    pkg_list=$(dnf5 repoquery --qf '%{name}\n' --repo="$copr_repo" | sort -u)
+    
     if [[ -z "$pkg_list" ]]; then
-        echo "  ⚠ No packages found in $copr (skipping)"
+        echo "  ⚠ No packages found in $copr_repo (skipping)"
         continue
     fi
 
     while IFS= read -r pkg; do
         if rpm -q "$pkg" >/dev/null 2>&1; then
-            echo "  🔄 Attempting to swap $pkg to COPR version..."
-            
-            # Try swap with COPR preferred but main repo available for deps
-            if ! dnf5 swap -y --skip-broken --skip-unavailable --allowerasing "$pkg" "$pkg" \
-                --enablerepo="copr:copr.fedorainfracloud.org:${copr////:}" 2>/tmp/dnf-error; then
+            echo "  🔄 Swapping $pkg (using $copr_repo)"
+            if ! dnf5 swap -y --skip-broken --skip-unavailable --allowerasing \
+               --repo="$copr_repo" "$pkg" "$pkg" 2>/tmp/dnf-error; then
                 
-                # If swap fails, try regular install
-                echo "  ⚠ Swap failed, trying regular install..."
-                if ! dnf5 install -y --skip-broken --skip-unavailable --allowerasing "$pkg" \
-                    --enablerepo="copr:copr.fedorainfracloud.org:${copr////:}" 2>/tmp/dnf-error; then
-                    
-                    error "Failed to install $pkg from $copr: $(grep -v '^Last metadata' /tmp/dnf-error | head -n5)"
-                    echo "  ⏩ Skipping $pkg due to errors"
-                fi
+                error "Swap failed: $(grep -v '^Last metadata' /tmp/dnf-error | head -n5)"
+                echo "  ⏩ Skipping $pkg"
             fi
         else
             echo "  ⏩ Skipping $pkg (not installed)"
         fi
     done <<< "$pkg_list"
 done
+
+### Clean up
+rm -f /tmp/dnf-error
 
 ### 🔧 KDE Build Dependencies
 log "Installing KDE build dependencies..."
