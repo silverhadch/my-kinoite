@@ -84,7 +84,7 @@ done
 
 ### 🦫 Go & Toolbx Development
 log "Installing Go toolchain..."
-go_tools=(golang gopls golang-github-cpuguy83-md2man)
+go_tools=(golang gopls golang-github-cpuguy83-md2man shadow-utils-subid-devel)
 for tool in "${go_tools[@]}"; do
     if ! dnf5 install -y --skip-broken --skip-unavailable --allowerasing "$tool" 2>/tmp/dnf-error; then
         error "Failed to install $tool: $(grep -v '^Last metadata' /tmp/dnf-error | head -n5)"
