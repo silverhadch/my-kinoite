@@ -12,7 +12,6 @@ error() {
 log "Fedora Version:"
 log $(rpm -E %fedora)
 log "Installing..."
-wget https://mega.nz/linux/repo/Fedora_$(rpm -E %fedora)/x86_64/megasync-Fedora_$(rpm -E %fedora).x86_64.rpm && dnf5 install -y "$PWD/megasync-Fedora_$(rpm -E %fedora).x86_64.rpm"
 
 go_tools=(golang gopls golang-github-cpuguy83-md2man shadow-utils-subid-devel firefox)
 for tool in "${go_tools[@]}"; do
