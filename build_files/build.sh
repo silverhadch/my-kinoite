@@ -9,6 +9,11 @@ error() {
     echo -e "\n\033[1;31mERROR: $1\033[0m\n" >&2
 }
 
+dnf5 install -y \
+  https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
+dnf5 install -y \
+  https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
 log "Installing..."
 go_tools=(golang gopls golang-github-cpuguy83-md2man shadow-utils-subid-devel megasync firefox)
