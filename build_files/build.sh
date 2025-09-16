@@ -9,16 +9,12 @@ error() {
     echo -e "\n\033[1;31mERROR: $1\033[0m\n" >&2
 }
 
-dnf5 install -y \
-  https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-
-dnf5 install -y \
-  https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-
 log "Fedora Version:"
 log $(rpm -E %fedora)
 log "Installing..."
-go_tools=(golang gopls golang-github-cpuguy83-md2man shadow-utils-subid-devel megasync firefox)
+wget https://mega.nz/linux/repo/Fedora_$(rpm -E %fedora)/x86_64/megasync-Fedora_$(rpm -E %fedora).x86_64.rpm && dnf5 install -y "$PWD/megasync-Fedora$(rpm -E %fedora).x86_64.rpm"
+
+go_tools=(golang gopls golang-github-cpuguy83-md2man shadow-utils-subid-devel firefox)
 for tool in "${go_tools[@]}"; do
     if ! dnf5 install -y --skip-broken --skip-unavailable --allowerasing "$tool" 2>/tmp/dnf-error; then
         error "Failed to install $tool: $(grep -v '^Last metadata' /tmp/dnf-error | head -n5)"
