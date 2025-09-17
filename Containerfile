@@ -1,10 +1,10 @@
+ARG BASE_IMAGE="ghcr.io/silverhadch/bazzite-kde-dx:latest"
 # Allow build scripts to be referenced without being copied into the final image
 FROM scratch AS ctx
 COPY build_files /
 
 # Base Image
-FROM ghcr.io/silverhadch/bazzite-kde-dx:latest
-
+FROM ${BASE_IMAGE}
 ## Other possible base images include:
 # FROM ghcr.io/ublue-os/bazzite:latest
 # FROM ghcr.io/ublue-os/bluefin-nvidia:stable
