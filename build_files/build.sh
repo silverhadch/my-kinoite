@@ -56,6 +56,7 @@ extra_pkgs=(
     github-desktop
     htop
     kcalc
+    konsole
     partitionmanager
     xdg-desktop-portal-kde
     libreoffice
