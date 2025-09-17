@@ -53,6 +53,7 @@ extra_pkgs=(
     flatpak
     gimp
     git
+    git-clang-format
     github-desktop
     htop
     kcalc
