@@ -47,6 +47,7 @@ dnf5 install -y firefoxpwa
 extra_pkgs=(
     btop
     bottles
+    clang-tools-extra
     curl
     discord
     flatpak
