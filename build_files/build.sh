@@ -13,6 +13,9 @@ log "Fedora Version:"
 log $(rpm -E %fedora)
 log "Installing..."
 
+log "Installing rdp2 tools..."
+dnf5 install -y --skip-broken --skip-unavailable --allowerasing freerdp2-libs freerdp2-devel
+
 log "Installing Virtualisations tools..."
 dnf5 group install -y --skip-broken --skip-unavailable --allowerasing --with-optional virtualization
 
