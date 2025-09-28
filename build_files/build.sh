@@ -13,11 +13,6 @@ log "Fedora Version:"
 log $(rpm -E %fedora)
 log "Installing..."
 
-log "Installing rdp2 tools..."
-dnf5 install -y --skip-broken --skip-unavailable --allowerasing freerdp2-libs freerdp2-devel
-
-log "Installing Virtualisations tools..."
-dnf5 group install -y --skip-broken --skip-unavailable --allowerasing --with-optional virtualization
 
 # Core Go tools
 go_tools=(
@@ -34,6 +29,7 @@ go_tools=(
     iproute
     libnotify
     nmap-ncat
+    gnome-boxes
 )
 for tool in "${go_tools[@]}"; do
     if ! dnf5 install -y --skip-broken --skip-unavailable --allowerasing "$tool" 2>/tmp/dnf-error; then
