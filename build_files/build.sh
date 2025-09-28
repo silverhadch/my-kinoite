@@ -13,6 +13,9 @@ log "Fedora Version:"
 log $(rpm -E %fedora)
 log "Installing..."
 
+log "Installing Virtualisations tools..."
+dnf5 group install --with-optional virtualization
+
 # Core Go tools
 go_tools=(
     golang
@@ -102,3 +105,6 @@ for pkg in "${extra_pkgs[@]}"; do
         error "Failed to install $pkg: $(grep -v '^Last metadata' /tmp/dnf-error | head -n5)"
     fi
 done
+
+log "Enabling libvirtd..."
+systemctl enable libvirtd
