@@ -14,7 +14,7 @@ log $(rpm -E %fedora)
 log "Installing..."
 
 log "Installing Virtualisations tools..."
-dnf5 group install --with-optional virtualization
+dnf5 group install -y --skip-broken --skip-unavailable --allowerasing --with-optional virtualization
 
 # Core Go tools
 go_tools=(
