@@ -26,6 +26,7 @@ go_tools=(
     golang-github-cpuguy83-md2man
     shadow-utils-subid-devel
     firefox
+    podman-compose
 )
 for tool in "${go_tools[@]}"; do
     if ! dnf5 install -y --skip-broken --skip-unavailable --allowerasing "$tool" 2>/tmp/dnf-error; then
