@@ -27,6 +27,13 @@ go_tools=(
     shadow-utils-subid-devel
     firefox
     podman-compose
+    curl
+    dialog
+    freerdp
+    git
+    iproute
+    libnotify
+    nmap-ncat
 )
 for tool in "${go_tools[@]}"; do
     if ! dnf5 install -y --skip-broken --skip-unavailable --allowerasing "$tool" 2>/tmp/dnf-error; then
