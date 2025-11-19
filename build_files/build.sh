@@ -115,3 +115,91 @@ done
 
 log "Enabling libvirtd..."
 systemctl enable libvirtd
+
+### Get KDE dependencies list
+log "Fetching KDE dependency list..."
+kde_deps=$(curl -s 'https://invent.kde.org/sysadmin/repo-metadata/-/raw/master/distro-dependencies/fedora.ini' |
+    sed '1d' | grep -vE '^\s*#|^\s*$')
+
+if [[ -z "$kde_deps" ]]; then
+    error "Failed to fetch KDE dependencies list"
+else
+    log "Installing KDE dependencies..."
+    echo "$kde_deps" | xargs dnf5 install -y --skip-broken --skip-unavailable --allowerasing 2>/tmp/dnf-error || \
+        error "Some KDE dependencies failed to install: $(grep -v '^Last metadata' /tmp/dnf-error | head -n5)"
+fi
+
+### 🎮 Development Tools
+log "Installing additional dev tools..."
+dev_tools=(neovim zsh flatpak-builder kdevelop kdevelop-devel kdevelop-libs)
+for tool in "${dev_tools[@]}"; do
+    if ! dnf5 install -y --skip-broken --skip-unavailable --allowerasing "$tool" 2>/tmp/dnf-error; then
+        error "Failed to install $tool: $(grep -v '^Last metadata' /tmp/dnf-error | head -n5)"
+    fi
+done
+
+### 🛠 Install kde-builder (manual clone + symlinks)
+log "Installing kde-builder..."
+tmpdir=$(mktemp -d)
+pushd "$tmpdir" >/dev/null
+
+git clone https://invent.kde.org/sdk/kde-builder.git
+cd kde-builder
+
+mkdir -p /usr/share/kde-builder
+cp -r ./* /usr/share/kde-builder
+
+mkdir -p /usr/bin
+ln -sf /usr/share/kde-builder/kde-builder /usr/bin/kde-builder
+
+mkdir -p /usr/share/zsh/site-functions
+ln -sf /usr/share/kde-builder/data/completions/zsh/_kde-builder \
+    /usr/share/zsh/site-functions/_kde-builder
+ln -sf /usr/share/kde-builder/data/completions/zsh/_kde-builder_projects_and_groups \
+    /usr/share/zsh/site-functions/_kde-builder_projects_and_groups
+
+popd >/dev/null
+rm -rf "$tmpdir"
+
+### 🛳 Install latest winboat (AppImage)
+log "Installing latest winboat..."
+REPO="TibixDev/winboat"
+tag=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | jq -r '.tag_name')
+version="${tag#v}"
+url="https://github.com/$REPO/releases/download/$tag/winboat-${version}-x86_64.AppImage"
+
+log "Downloading $url"
+curl -L -o "winboat-${version}.AppImage" "$url"
+
+log "Installing winboat ${version}"
+mv "./winboat-${version}.AppImage" /usr/bin/winboat || error "Failed to install winboat"
+chmod +x /usr/bin/winboat
+
+### 🖼 Install icon
+log "Installing winboat icon..."
+install -Dm644 /dev/null "/usr/share/icons/hicolor/scalable/apps/winboat.svg"
+curl -L "https://raw.githubusercontent.com/TibixDev/winboat/refs/heads/main/gh-assets/winboat_logo.svg" \
+    -o "/usr/share/icons/hicolor/scalable/apps/winboat.svg" || error "Failed to download icon"
+
+### 🖥 Create .desktop file
+log "Creating desktop entry..."
+desktop_file="/usr/share/applications/winboat.desktop"
+echo "[Desktop Entry]"                >  "$desktop_file"
+echo "Name=winboat"                  >> "$desktop_file"
+echo "Exec=/usr/bin/winboat %U"      >> "$desktop_file"
+echo "Terminal=false"                >> "$desktop_file"
+echo "Type=Application"              >> "$desktop_file"
+echo "Icon=winboat"                  >> "$desktop_file"
+echo "StartupWMClass=winboat"        >> "$desktop_file"
+echo "Comment=Windows for Penguins"  >> "$desktop_file"
+echo "Categories=Utility;"           >> "$desktop_file"
+
+### 🔌 Enable systemd units
+log "Enabling podman socket..."
+systemctl enable podman.socket || error "Failed to enable podman.socket"
+
+log "Enabling waydroid service..."
+systemctl enable waydroid-container.service || error "Failed to enable waydroid-container.service"
+
+log "Enabling and starting docker..."
+systemctl enable --now docker.service || error "Failed to enable/start docker"
