@@ -34,10 +34,10 @@ jobs:
       matrix:
         variant:
           - name: dx
-            base_image: ghcr.io/silverhadch/bazzite-kde-dx:latest
+            base_image: ghcr.io/ublue-os/bazzite-dx:latest
             suffix: ""
           - name: nvidia
-            base_image: ghcr.io/silverhadch/bazzite-kde-dx:latest
+            base_image: ghcr.io/ublue-os/bazzite-dx:latest
             suffix: "-nvidia"
 
     permissions:
