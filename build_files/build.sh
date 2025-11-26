@@ -76,7 +76,7 @@ extra_pkgs=(
     toolbox vim vlc wget xdg-desktop-portal-gtk cmake-gui gcc make go gopls
     golang-github-cpuguy83-md2man libgcc meson shadow-utils podman xdg-utils
     wayland-utils kde-dev-utils kde-dev-scripts cowsay fortune-mod sl ponysay
-    cmatrix toilet figlet rig nyancat nasm kpipewire-devel "kf6-*-devel" "kde-*-devel"
+    cmatrix toilet figlet rig pipewire-devel nyancat nasm kpipewire-devel "kf6-*-devel" "kde-*-devel"
 )
 for pkg in "${extra_pkgs[@]}"; do
     if ! dnf5 install -y --skip-broken --skip-unavailable --allowerasing "$pkg" 2>/tmp/dnf-error; then
