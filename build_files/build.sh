@@ -12,6 +12,39 @@ error() {
 log "Fedora $(rpm -E %fedora) - running setup..."
 
 ### --------------------
+### Nix bind mount (/var/nix-mount → /nix)
+### --------------------
+log "Setting up Nix bind mount..."
+
+# Ensure the real backing directory exists
+tee /etc/tmpfiles.d/nix-mount.conf >/dev/null <<'EOF'
+# Ensure target directory exists
+d /var/nix-mount 0755 root root -
+EOF
+
+# Ensure the mountpoint exists (systemd mount units require the directory)
+mkdir -p /nix
+
+# systemd mount unit for /nix -> /var/nix-mount
+cat >/etc/systemd/system/nix.mount <<'EOF'
+[Unit]
+Description=Bind mount for Nix store
+After=local-fs.target
+Before=multi-user.target
+
+[Mount]
+What=/var/nix-mount
+Where=/nix
+Type=none
+Options=bind
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl enable nix.mount || error "Failed to enable nix.mount"
+
+### --------------------
 ### Firefox
 ### --------------------
 log "Installing Firefox..."
@@ -188,13 +221,6 @@ fi
 ### Additional dev tools
 ### --------------------
 install_group "extra dev tools" neovim zsh flatpak-builder kdevelop kdevelop-devel kdevelop-libs rust cargo
-
-tee /etc/tmpfiles.d/nix-symlink.conf >/dev/null <<'EOF'
-# Ensure target directory exists
-d /var/nix-symlink 0755 root root -
-EOF
-
-ln -s /var/nix-symlink /nix
 
 ### --------------------
 ### kde-builder install
