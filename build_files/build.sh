@@ -144,7 +144,7 @@ fi
 ### --------------------
 ### Additional dev tools
 ### --------------------
-install_group "extra dev tools" neovim zsh flatpak-builder kdevelop kdevelop-devel kdevelop-libs
+install_group "extra dev tools" neovim zsh flatpak-builder kdevelop kdevelop-devel kdevelop-libs rust cargo
 
 tee /etc/tmpfiles.d/nix-symlink.conf >/dev/null <<'EOF'
 # Ensure target directory exists
