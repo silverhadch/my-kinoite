@@ -76,7 +76,9 @@ extra_pkgs=(
     toolbox vim vlc wget xdg-desktop-portal-gtk cmake-gui gcc make go gopls
     golang-github-cpuguy83-md2man libgcc meson shadow-utils podman xdg-utils
     wayland-utils kde-dev-utils kde-dev-scripts cowsay fortune-mod sl ponysay
-    cmatrix toilet figlet rig pipewire-devel nyancat nasm kpipewire-devel "kf6-*-devel" "kde-*-devel"
+    cmatrix toilet figlet rig pipewire-devel nyancat nasm btrfs-progs-devel python3-btrfsutil kpipewire-devel "kf6-*-devel" "kde-*-devel"
+    cmake(KF6CoreAddons) cmake(KF6I18n) cmake(Qt6Core) cmake(Qt6DBus) cmake(Qt6Gui) cmake(Qt6Quick) qt6-qtbase-private-devel pkgconfig(epoxy) pkgconfig(gbm) pkgconfig(libavcodec)
+    pkgconfig(libavfilter) pkgconfig(libavformat) pkgconfig(libavutil) pkgconfig(libdrm) pkgconfig(libpipewire-0.3) pkgconfig(libswscale) pkgconfig(libva-drm) pkgconfig(libva)
 )
 for pkg in "${extra_pkgs[@]}"; do
     if ! dnf5 install -y --skip-broken --skip-unavailable --allowerasing "$pkg" 2>/tmp/dnf-error; then
