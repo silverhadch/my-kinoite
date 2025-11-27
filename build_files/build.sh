@@ -28,9 +28,9 @@ mkdir -p /nix
 # systemd mount unit for /nix -> /var/nix-mount
 cat >/etc/systemd/system/nix.mount <<'EOF'
 [Unit]
-Description=Bind mount for Nix store
-After=local-fs.target
-Before=multi-user.target
+Description=Bind mount for Nix store (will fail first run)
+Before=local-fs.target
+After=var.mount
 
 [Mount]
 What=/var/nix-mount
