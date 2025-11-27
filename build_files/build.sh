@@ -61,7 +61,7 @@ desktop_pkgs=(
     htop kcalc konsole partitionmanager libreoffice
     qbittorrent spotify steam supertux supertuxkart thunderbird
     vim vlc wget steam xdg-desktop-portal-kde xdg-desktop-portal-gtk
-    cmatrix cowsay fortune-mod sl ponysay toilet figlet rig nyancat
+    cmatrix cowsay fortune-mod sl ponysay toilet figlet rig nyancat waydroid
 )
 
 ### --------------------
