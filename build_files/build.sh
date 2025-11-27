@@ -45,6 +45,16 @@ EOF
 systemctl enable nix.mount || error "Failed to enable nix.mount"
 
 ### --------------------
+### KDE Builder Conf and Sysext
+### --------------------
+log "Setting up KDE Builder Config..."
+mkdir -p /etc/xdg
+cp /ctx/kde-builder.yaml /etc/xdg/
+
+log "Installing systemd-sysext for KDE Builder Setup Script..."
+cp /ctx/setup-kde-sysext /usr/bin/
+
+### --------------------
 ### Firefox
 ### --------------------
 log "Installing Firefox..."
@@ -76,6 +86,7 @@ kde_devel_pkgs=(
     # KDE frameworks & general Plasma dev headers
     kpipewire-devel
     pipewire-devel
+    plasma-wayland-protocols-devel
     kf6-*-devel
     kde-*-devel
 
@@ -97,6 +108,7 @@ kde_devel_pkgs=(
     "cmake(Qt6Qml)"
     "cmake(Qt6Quick)"
     "cmake(Qt6WaylandClient)"
+
     qt6-qtbase-private-devel
 
     # FreeRDP stack
