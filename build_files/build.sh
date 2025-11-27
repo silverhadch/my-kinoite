@@ -40,16 +40,59 @@ dev_pkgs=(
 ### KDE / Qt / PipeWire development
 ### --------------------
 kde_devel_pkgs=(
-    kpipewire-devel pipewire-devel
-    kf6-*-devel kde-*-devel
+    # KDE frameworks & general Plasma dev headers
+    kpipewire-devel
+    pipewire-devel
+    kf6-*-devel
+    kde-*-devel
+
+    # KF6 CMake deps
+    "cmake(KF6Config)"
+    "cmake(KF6CoreAddons)"
+    "cmake(KF6Crash)"
+    "cmake(KF6DBusAddons)"
+    "cmake(KF6GuiAddons)"
+    "cmake(KF6I18n)"
+    "cmake(KF6KCMUtils)"
+    "cmake(KF6StatusNotifierItem)"
+
+    # Qt6 CMake deps
+    "cmake(Qt6Core)"
+    "cmake(Qt6DBus)"
+    "cmake(Qt6Gui)"
+    "cmake(Qt6Network)"
+    "cmake(Qt6Qml)"
+    "cmake(Qt6Quick)"
+    "cmake(Qt6WaylandClient)"
     qt6-qtbase-private-devel
-    "cmake(KF6CoreAddons)" "cmake(KF6I18n)"
-    "cmake(Qt6Core)" "cmake(Qt6DBus)" "cmake(Qt6Gui)" "cmake(Qt6Quick)"
-    "pkgconfig(epoxy)" "pkgconfig(gbm)" "pkgconfig(libdrm)"
+
+    # FreeRDP stack
+    "cmake(FreeRDP-Server)>=3"
+    "cmake(FreeRDP)>=3"
+    "cmake(WinPR)>=3"
+
+    # Extra KDE/Wayland components
+    "cmake(KPipeWire)"
+    "cmake(PlasmaWaylandProtocols)"
+    "cmake(Qt6Keychain)"
+
+    # pkgconfig deps
+    "pkgconfig(epoxy)"
+    "pkgconfig(gbm)"
+    "pkgconfig(libdrm)"
     "pkgconfig(libpipewire-0.3)"
-    "pkgconfig(libavcodec)" "pkgconfig(libavfilter)" "pkgconfig(libavformat)"
-    "pkgconfig(libavutil)" "pkgconfig(libswscale)"
-    "pkgconfig(libva-drm)" "pkgconfig(libva)"
+    "pkgconfig(libavcodec)"
+    "pkgconfig(libavfilter)"
+    "pkgconfig(libavformat)"
+    "pkgconfig(libavutil)"
+    "pkgconfig(libswscale)"
+    "pkgconfig(libva-drm)"
+    "pkgconfig(libva)"
+    "pkgconfig(xkbcommon)"
+
+    # System deps
+    pam-devel
+    wayland-devel
 )
 
 ### --------------------
