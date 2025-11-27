@@ -119,6 +119,7 @@ kde_devel_pkgs=(
     # Extra KDE/Wayland components
     "cmake(KPipeWire)"
     "cmake(PlasmaWaylandProtocols)"
+    "cmake(Qca)"
     "cmake(Qt6Keychain)"
 
     # pkgconfig deps
