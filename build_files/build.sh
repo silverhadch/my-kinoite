@@ -9,47 +9,93 @@ error() {
     echo -e "\n\033[1;31mERROR: $1\033[0m\n" >&2
 }
 
-log "Fedora Version:"
-log "$(rpm -E %fedora)"
-log "Running main setup..."
+log "Fedora $(rpm -E %fedora) - running setup..."
 
 ### --------------------
 ### Firefox
 ### --------------------
-
 log "Installing Firefox..."
 if ! dnf5 install -y --allowerasing firefox 2>/tmp/firefox-dnf-error ; then
     error "Failed to install Firefox: $(grep -v '^Last metadata' /tmp/firefox-dnf-error | head -n5)"
 fi
 
 ### --------------------
-### Core Go tools and primary utilities
+### Core system tools
 ### --------------------
-
-go_tools=(
-    golang
-    gopls
-    golang-github-cpuguy83-md2man
-    shadow-utils-subid-devel
-    podman-compose
-    curl
-    dialog
-    freerdp
-    git
-    iproute
-    libnotify
-    nmap-ncat
+core_system_pkgs=(
+    curl dialog freerdp git iproute libnotify nmap-ncat shadow-utils-subid-devel
     gnome-boxes
 )
-for tool in "${go_tools[@]}"; do
-    if ! dnf5 install -y --skip-broken --skip-unavailable --allowerasing "$tool" 2>/tmp/dnf-error; then
-        error "Failed to install $tool: $(grep -v '^Last metadata' /tmp/dnf-error | head -n5)"
-    fi
-done
+
+### --------------------
+### Development toolchain
+### --------------------
+dev_pkgs=(
+    gcc make go gopls golang golang-github-cpuguy83-md2man
+    meson cmake-gui libgcc nasm
+    btrfs-progs-devel python3-btrfsutil
+)
+
+### --------------------
+### KDE / Qt / PipeWire development
+### --------------------
+kde_devel_pkgs=(
+    kpipewire-devel pipewire-devel
+    kf6-*-devel kde-*-devel
+    qt6-qtbase-private-devel
+    "cmake(KF6CoreAddons)" "cmake(KF6I18n)"
+    "cmake(Qt6Core)" "cmake(Qt6DBus)" "cmake(Qt6Gui)" "cmake(Qt6Quick)"
+    "pkgconfig(epoxy)" "pkgconfig(gbm)" "pkgconfig(libdrm)"
+    "pkgconfig(libpipewire-0.3)"
+    "pkgconfig(libavcodec)" "pkgconfig(libavfilter)" "pkgconfig(libavformat)"
+    "pkgconfig(libavutil)" "pkgconfig(libswscale)"
+    "pkgconfig(libva-drm)" "pkgconfig(libva)"
+)
+
+### --------------------
+### Desktop software (apps, games, tools)
+### --------------------
+desktop_pkgs=(
+    btop bottles clang-tools-extra
+    discord flatpak gimp git-clang-format github-desktop
+    htop kcalc konsole partitionmanager libreoffice
+    qbittorrent spotify steam supertux supertuxkart thunderbird
+    vim vlc wget steam xdg-desktop-portal-kde xdg-desktop-portal-gtk
+    cmatrix cowsay fortune-mod sl ponysay toilet figlet rig nyancat
+)
+
+### --------------------
+### Network/Container tools
+### --------------------
+network_pkgs=(
+    podman podman-compose toolbox xdg-utils wayland-utils
+)
+
+### --------------------
+### Generic installer helper
+### --------------------
+install_group() {
+    local title="$1"; shift
+    local pkgs=("$@")
+
+    log "Installing $title..."
+    for pkg in "${pkgs[@]}"; do
+        if ! dnf5 install -y --skip-broken --skip-unavailable --allowerasing "$pkg" 2>/tmp/dnf-error; then
+            error "Failed to install $pkg: $(grep -v '^Last metadata' /tmp/dnf-error | head -n5)"
+        fi
+    done
+}
+
+install_group "core system tools"      "${core_system_pkgs[@]}"
+install_group "development tools"       "${dev_pkgs[@]}"
+install_group "desktop software"        "${desktop_pkgs[@]}"
+install_group "network/container tools" "${network_pkgs[@]}"
+install_group "KDE/Qt/PipeWire deps"    "${kde_devel_pkgs[@]}"
 
 ### --------------------
 ### Firefox PWA repo
 ### --------------------
+log "Configuring FirefoxPWA repo..."
 rpm --import https://packagecloud.io/filips/FirefoxPWA/gpgkey
 cat >/etc/yum.repos.d/firefoxpwa.repo <<'EOF'
 [firefoxpwa]
@@ -62,135 +108,92 @@ gpgcheck=0
 enabled=1
 EOF
 
-dnf5 -q makecache -y --disablerepo="*" --enablerepo="firefoxpwa"
-dnf5 install -y firefoxpwa
+dnf5 -q makecache -y --disablerepo="*" --enablerepo="firefoxpwa" || true
+dnf5 install -y firefoxpwa || error "Failed to install FirefoxPWA"
 
 ### --------------------
-### Extra software (mapped from NixOS config)
+### Virtualization stack
 ### --------------------
-
-extra_pkgs=(
-    btop bottles clang-tools-extra curl discord flatpak gimp git git-clang-format
-    github-desktop htop kcalc konsole partitionmanager xdg-desktop-portal-kde
-    libreoffice qbittorrent spotify supertux supertuxkart thunderbird
-    toolbox vim vlc wget xdg-desktop-portal-gtk cmake-gui gcc make go gopls
-    golang-github-cpuguy83-md2man libgcc meson shadow-utils podman xdg-utils
-    wayland-utils kde-dev-utils kde-dev-scripts cowsay fortune-mod sl ponysay
-    cmatrix toilet figlet rig pipewire-devel nyancat nasm btrfs-progs-devel python3-btrfsutil kpipewire-devel "kf6-*-devel" "kde-*-devel"
-    "cmake(KF6CoreAddons)" "cmake(KF6I18n)" "cmake(Qt6Core)" "cmake(Qt6DBus)" "cmake(Qt6Gui)" "cmake(Qt6Quick)" qt6-qtbase-private-devel "pkgconfig(epoxy)" "pkgconfig(gbm)" "pkgconfig(libavcodec)"
-    "pkgconfig(libavfilter)" "pkgconfig(libavformat)" "pkgconfig(libavutil)" "pkgconfig(libdrm)" "pkgconfig(libpipewire-0.3)" "pkgconfig(libswscale)" "pkgconfig(libva-drm)" "pkgconfig(libva)"
-)
-for pkg in "${extra_pkgs[@]}"; do
-    if ! dnf5 install -y --skip-broken --skip-unavailable --allowerasing "$pkg" 2>/tmp/dnf-error; then
-        error "Failed to install $pkg: $(grep -v '^Last metadata' /tmp/dnf-error | head -n5)"
-    fi
-done
-
-### --------------------
-### Virtualization stack: Tools & Services
-### --------------------
-
-log "Installing Fedora Virtualization group and dependencies..."
+log "Installing virtualization group..."
 if ! dnf5 group install -y --with-optional virtualization 2>/tmp/dnf-virt-error; then
-    error "Failed to install virtualization group: $(grep -v '^Last metadata' /tmp/dnf-virt-error | head -n5)"
+    error "Virtualization group failed: $(grep -v '^Last metadata' /tmp/dnf-virt-error | head -n5)"
 fi
 
 virt_pkgs=(qemu-kvm virt-manager virt-install virt-viewer libvirt-daemon-config-network libvirt-daemon-kvm)
-for pkg in "${virt_pkgs[@]}"; do
-    if ! dnf5 install -y --allowerasing "$pkg" 2>/tmp/dnf-virt-error; then
-        error "Failed to install virtualization tool/pkg $pkg: $(grep -v '^Last metadata' /tmp/dnf-virt-error | head -n5)"
-    fi
-done
+install_group "virtualization extras" "${virt_pkgs[@]}"
 
-# Only enable default virsh network for autostart (do not start or enable any services in CI/rootfs)
-log "Enabling default libvirt network for autostart..."
+log "Setting libvirt autostart..."
 if virsh net-info default &>/dev/null; then
-    virsh net-autostart default || error "Failed to set default network to autostart"
-else
-    error "No default libvirt network found; please run 'virsh net-define ...' manually."
+    virsh net-autostart default || error "Failed to autostart default network"
 fi
 
 ### --------------------
-### KDE dependencies
+### KDE dependency list
 ### --------------------
-
-log "Fetching KDE dependency list..."
+log "Fetching KDE metadata deps..."
 kde_deps=$(curl -s "https://invent.kde.org/sysadmin/repo-metadata/-/raw/master/distro-dependencies/fedora.ini" | sed '1d' | grep -vE '^\s*#|^\s*$')
-if [[ -z "$kde_deps" ]]; then
-    error "Failed to fetch KDE dependencies list"
-else
-    log "Installing KDE dependencies..."
+
+if [[ -n "$kde_deps" ]]; then
+    log "Installing KDE metadata deps..."
     echo "$kde_deps" | xargs dnf5 install -y --skip-broken --skip-unavailable --allowerasing 2>/tmp/dnf-error || \
-        error "Some KDE dependencies failed to install: $(grep -v '^Last metadata' /tmp/dnf-error | head -n5)"
+        error "Some KDE deps failed: $(grep -v '^Last metadata' /tmp/dnf-error | head -n5)"
+else
+    error "Failed to fetch KDE dependency metadata"
 fi
 
 ### --------------------
-### Additional Dev Tools
+### Additional dev tools
 ### --------------------
-log "Installing additional dev tools..."
-dev_tools=(neovim zsh flatpak-builder kdevelop kdevelop-devel kdevelop-libs)
-for tool in "${dev_tools[@]}"; do
-    if ! dnf5 install -y --skip-broken --skip-unavailable --allowerasing "$tool" 2>/tmp/dnf-error; then
-        error "Failed to install $tool: $(grep -v '^Last metadata' /tmp/dnf-error | head -n5)"
-    fi
-done
+install_group "extra dev tools" neovim zsh flatpak-builder kdevelop kdevelop-devel kdevelop-libs
 
 ### --------------------
-### kde-builder
+### kde-builder install
 ### --------------------
 log "Installing kde-builder..."
 tmpdir=$(mktemp -d)
 pushd "$tmpdir" >/dev/null
 git clone https://invent.kde.org/sdk/kde-builder.git
 cd kde-builder
-mkdir -p /usr/share/kde-builder
+install -d /usr/share/kde-builder
 cp -r ./* /usr/share/kde-builder
-mkdir -p /usr/bin
 ln -sf /usr/share/kde-builder/kde-builder /usr/bin/kde-builder
-mkdir -p /usr/share/zsh/site-functions
-ln -sf /usr/share/kde-builder/data/completions/zsh/_kde-builder /usr/share/zsh/site-functions/_kde-builder
-ln -sf /usr/share/kde-builder/data/completions/zsh/_kde-builder_projects_and_groups /usr/share/zsh/site-functions/_kde-builder_projects_and_groups
+
+install -d /usr/share/zsh/site-functions
+ln -sf /usr/share/kde-builder/data/completions/zsh/_kde-builder /usr/share/zsh/site-functions/
+ln -sf /usr/share/kde-builder/data/completions/zsh/_kde-builder_projects_and_groups /usr/share/zsh/site-functions/
 popd >/dev/null
 rm -rf "$tmpdir"
 
 ### --------------------
-### winboat (latest AppImage)
+### winboat installer
 ### --------------------
-log "Installing latest winboat..."
+log "Installing winboat..."
 REPO="TibixDev/winboat"
 tag=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | jq -r '.tag_name')
 version="${tag#v}"
 url="https://github.com/$REPO/releases/download/$tag/winboat-${version}-x86_64.AppImage"
 
-log "Downloading $url"
 curl -L -o "winboat-${version}.AppImage" "$url"
-
-log "Installing winboat ${version}"
-mv "./winboat-${version}.AppImage" /usr/bin/winboat || error "Failed to install winboat"
+mv "winboat-${version}.AppImage" /usr/bin/winboat
 chmod +x /usr/bin/winboat
 
-log "Installing winboat icon..."
-install -Dm644 /dev/null "/usr/share/icons/hicolor/scalable/apps/winboat.svg"
-curl -L "https://raw.githubusercontent.com/TibixDev/winboat/refs/heads/main/gh-assets/winboat_logo.svg" -o "/usr/share/icons/hicolor/scalable/apps/winboat.svg" || error "Failed to download icon"
+install -Dm644 <(curl -sL https://raw.githubusercontent.com/TibixDev/winboat/refs/heads/main/gh-assets/winboat_logo.svg) "/usr/share/icons/hicolor/scalable/apps/winboat.svg"
 
-log "Creating desktop entry..."
-desktop_file="/usr/share/applications/winboat.desktop"
-echo "[Desktop Entry]"                >  "$desktop_file"
-echo "Name=winboat"                  >> "$desktop_file"
-echo "Exec=/usr/bin/winboat %U"      >> "$desktop_file"
-echo "Terminal=false"                >> "$desktop_file"
-echo "Type=Application"              >> "$desktop_file"
-echo "Icon=winboat"                  >> "$desktop_file"
-echo "StartupWMClass=winboat"        >> "$desktop_file"
-echo "Comment=Windows for Penguins"  >> "$desktop_file"
-echo "Categories=Utility;"           >> "$desktop_file"
+cat >/usr/share/applications/winboat.desktop <<EOF
+[Desktop Entry]
+Name=winboat
+Exec=/usr/bin/winboat %U
+Terminal=false
+Type=Application
+Icon=winboat
+StartupWMClass=winboat
+Comment=Windows for Penguins
+Categories=Utility;
+EOF
 
 ### --------------------
-### Enable podman, waydroid, docker (no --now)
+### Enable services (no --now)
 ### --------------------
-log "Enabling podman socket..."
 systemctl enable podman.socket || error "Failed to enable podman.socket"
-log "Enabling waydroid service..."
 systemctl enable waydroid-container.service || error "Failed to enable waydroid-container.service"
-log "Enabling docker service..."
 systemctl enable docker.service || error "Failed to enable docker.service"
