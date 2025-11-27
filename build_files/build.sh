@@ -146,6 +146,13 @@ fi
 ### --------------------
 install_group "extra dev tools" neovim zsh flatpak-builder kdevelop kdevelop-devel kdevelop-libs
 
+tee /etc/tmpfiles.d/nix-symlink.conf >/dev/null <<'EOF'
+# Ensure target directory exists
+d /var/nix-symlink 0755 root root -
+EOF
+
+ln -s /var/nix-symlink /nix
+
 ### --------------------
 ### kde-builder install
 ### --------------------
