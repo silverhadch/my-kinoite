@@ -53,8 +53,10 @@ else
     # Make the release file owned by root so it can't be accidentally removed
     sudo chown root:root "${SYSEXT_LOCATION}/extension-release.kde"
 
+    sudo systemctl disable systemd-sysext.service 
+
     # Turn it on!
     sudo systemd-sysext merge
 
-    echo "Finished setting up extension! When you put files in ${SYSEXT_BASE_LOCATION} and run 'sudo systemd-sysext refresh', they will appear in /usr/. See https://community.kde.org/KDE_Linux/Add_or_override_content_in_/usr for more information."
+    echo "Finished setting up extension! When you put files in ${SYSEXT_BASE_LOCATION} and run 'sudo systemd-sysext refresh', they will appear in /usr/. Run 'sudo systemd-sysext unmerge' to disable and 'sudo systemd-sysext merge' to reenable. See https://community.kde.org/KDE_Linux/Add_or_override_content_in_/usr for more information."
 fi
