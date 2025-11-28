@@ -75,6 +75,7 @@ dev_pkgs=(
 kde_devel_pkgs=(
     # KDE frameworks & general Plasma dev headers
     aurorae-devel
+    krdp-devel
     kpipewire-devel
     pipewire-devel
     plasma-wayland-protocols-devel
@@ -105,6 +106,7 @@ kde_devel_pkgs=(
     qt6-qtbase-private-devel
 
     # FreeRDP stack
+    libwinpr-devel
     "cmake(FreeRDP-Server)>=3"
     "cmake(FreeRDP)>=3"
     "cmake(WinPR)>=3"
