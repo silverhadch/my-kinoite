@@ -88,6 +88,7 @@ kde_devel_pkgs=(
     pipewire-devel
     plasma-wayland-protocols-devel
     kf6-*-devel
+    kdecoration-devel
     kde-*-devel
 
     # KF6 CMake deps
