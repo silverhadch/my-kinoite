@@ -90,6 +90,7 @@ kde_devel_pkgs=(
     kf6-*-devel
     kdecoration-devel
     kde-*-devel
+    kwayland-devel
 
     # KF6 CMake deps
     "cmake(KF6Config)"
