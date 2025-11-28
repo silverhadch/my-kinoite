@@ -76,7 +76,7 @@ core_system_pkgs=(
 dev_pkgs=(
     gcc make go gopls golang golang-github-cpuguy83-md2man
     meson cmake-gui libgcc nasm
-    btrfs-progs-devel python3-btrfsutil
+    bash-language-server btrfs-progs-devel python3-btrfsutil ShellCheck
 )
 
 ### --------------------
