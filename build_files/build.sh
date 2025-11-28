@@ -84,6 +84,7 @@ dev_pkgs=(
 ### --------------------
 kde_devel_pkgs=(
     # KDE frameworks & general Plasma dev headers
+    aurorae-devel
     kpipewire-devel
     pipewire-devel
     plasma-wayland-protocols-devel
