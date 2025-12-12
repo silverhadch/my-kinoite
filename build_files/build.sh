@@ -64,7 +64,7 @@ core_system_pkgs=(
 ### Development toolchain
 ### --------------------
 dev_pkgs=(
-    dnf-plugins-core expect gawk libcmocka-devel systemd-devel gcc make go gopls golang golang-github-cpuguy83-md2man
+    dnf-plugins-core libbsd-devel expect gawk libcmocka-devel systemd-devel gcc make go gopls golang golang-github-cpuguy83-md2man
     meson cmake-gui libgcc nasm
     bash-language-server btrfs-progs-devel python3-btrfsutil ShellCheck
 )
